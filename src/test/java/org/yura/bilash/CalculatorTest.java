@@ -15,7 +15,7 @@ public class CalculatorTest {
 
 	// kind of static but it avoids using reflection
 	private static final AtomicInteger ADD_NEGATIVE_NOT_ALLOWED_EXCEPTION_COUNTER = new AtomicInteger(0);
-	private static final String [] ADD_NEGATIVE_NOT_ALLOWED_EXCEPTION_NEGATIVES = {
+	private static final String[] ADD_NEGATIVE_NOT_ALLOWED_EXCEPTION_NEGATIVES = {
 		"[-1]",
 		"[-1, -2, -3]",
 		"[-1, -2, -4]"
@@ -90,5 +90,17 @@ public class CalculatorTest {
 		int i = ADD_NEGATIVE_NOT_ALLOWED_EXCEPTION_COUNTER.getAndAdd(1);
 		String valueSourceNegatives = ADD_NEGATIVE_NOT_ALLOWED_EXCEPTION_NEGATIVES[i];
 		assertEquals(NegativeNotAllowedException.ERROR_MSG_PREFIX + valueSourceNegatives, exc.getMessage());
+	}
+
+	@ParameterizedTest
+	@LambdaSeparatorValueSource(value = {
+		"//;\n1;1000;2 -> 1003",
+		"//-\n1-2000-3 -> 4",
+		"//*\n10000*2*3*4 -> 9"
+	})
+	public void addIgnoreBigNumbers(String numbers, Integer expected) {
+		var calculator = new Calculator();
+		int result = calculator.add(numbers);
+		assertEquals(expected, result);
 	}
 }

@@ -2,4 +2,6 @@
 
 `string-calculator.txt` file contains requirements.
 
-[Original link](https://youtu.be/y8TcPr73Bwo)
+C# implementation: [original link](https://youtu.be/y8TcPr73Bwo)
+
+Java implementation you can find in this repository.
