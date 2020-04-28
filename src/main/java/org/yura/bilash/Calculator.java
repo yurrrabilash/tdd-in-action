@@ -12,7 +12,7 @@ public class Calculator {
 	private static final String NEGATIVE_SIGN = "-";
 	private static final String ESCAPE_CHARACTER = "\\";
 	private static final String DEFAULT_DELIMITER = "[,\n]";
-	private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.*)\\n(.*)");
+	private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//\\[?([^\\]]*)\\]?\\n(.*)");
 	private static final Pattern SPECIAL_REGEX_SYMBOLS_PATTERN = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
 
 	public int add(String numbers) {
@@ -48,11 +48,7 @@ public class Calculator {
 		Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(numbers);
 		if (matcher.matches()) {
 			String delimiter = matcher.group(1);
-			String delimiterEscaped = delimiter;
-
-			if (isSpecialRegexSymbol(delimiter)) {
-				delimiterEscaped = ESCAPE_CHARACTER + delimiter;
-			}
+			String delimiterEscaped = escapeSpecSymbols(delimiter);
 			String customSeparatedNumbers = matcher.group(2);
 			String[] customSeparatedNumbersArr = customSeparatedNumbers.split(delimiterEscaped);
 			if (!NEGATIVE_SIGN.equals(delimiter)) {
@@ -63,6 +59,20 @@ public class Calculator {
 		}
 
 		return Optional.empty();
+	}
+
+	private String escapeSpecSymbols(String delimiter) {
+		StringBuilder escapedDelimiter = new StringBuilder();
+		char[] delimiterChars = delimiter.toCharArray();
+		for (char delimiterChar : delimiterChars) {
+			if (isSpecialRegexSymbol(delimiter)) {
+				escapedDelimiter.append(ESCAPE_CHARACTER).append(delimiterChar);
+			} else {
+				escapedDelimiter.append(delimiterChar);
+			}
+		}
+
+		return escapedDelimiter.toString();
 	}
 
 	private void validateNumbers(String[] numbersStr) {

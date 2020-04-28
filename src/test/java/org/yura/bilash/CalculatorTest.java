@@ -103,4 +103,15 @@ public class CalculatorTest {
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
+
+	@ParameterizedTest
+	@LambdaSeparatorValueSource(value = {
+		"//[***]\n1***2***3 -> 6",
+		"//[---]\n1---2---3 -> 6"
+	})
+	public void addAnyLengthDelimiter(String numbers, Integer expected) {
+		var calculator = new Calculator();
+		int result = calculator.add(numbers);
+		assertEquals(expected, result);
+	}
 }
