@@ -1,5 +1,4 @@
-
-#String Calculator TDD approach
+# String Calculator TDD approach
 
 ## Requirements
 `string-calculator.txt` file contains all requirements/use cases.
