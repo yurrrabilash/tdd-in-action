@@ -66,8 +66,7 @@ public class CalculatorTest {
 		"//;\n1;2 -> 3",
 		"//-\n1-2-3 -> 6",
 		"//*\n1*2*3*4 -> 10",
-		"//|\n1|2|3|4|5 -> 15",
-		"//->\n1->2->3->4->5 -> 15"
+		"//|\n1|2|3|4|5 -> 15"
 	})
 	public void addSupportDifferentDelimiters(String numbers, Integer expected) {
 		var calculator = new Calculator();
@@ -107,9 +106,33 @@ public class CalculatorTest {
 	@ParameterizedTest
 	@LambdaSeparatorValueSource(value = {
 		"//[***]\n1***2***3 -> 6",
-		"//[---]\n1---2---3 -> 6"
+		"//[---]\n1---2---3 -> 6",
+		"//[->]\n1->2->3->4->5 -> 15"
 	})
 	public void addAnyLengthDelimiter(String numbers, Integer expected) {
+		var calculator = new Calculator();
+		int result = calculator.add(numbers);
+		assertEquals(expected, result);
+	}
+
+
+	@ParameterizedTest
+	@LambdaSeparatorValueSource(value = {
+		"//[*][%]\n1*2%3 -> 6",
+		"//[*][%][-]\n1*2%3-4 -> 10",
+	})
+	public void addAllowMultipleDelimiters(String numbers, Integer expected) {
+		var calculator = new Calculator();
+		int result = calculator.add(numbers);
+		assertEquals(expected, result);
+	}
+
+	@ParameterizedTest
+	@LambdaSeparatorValueSource(value = {
+		"//[***][%%]\n1***2%%3 -> 6",
+		"//[*][%%][--]\n1*2%%3--4 -> 10",
+	})
+	public void addAllowMultipleDelimitersWithAnyLengthLong(String numbers, Integer expected) {
 		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);

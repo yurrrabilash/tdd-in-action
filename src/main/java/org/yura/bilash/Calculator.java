@@ -2,25 +2,27 @@ package org.yura.bilash;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.yura.bilash.exception.NegativeNotAllowedException;
 
 public class Calculator {
-	private static final String NEGATIVE_SIGN = "-";
+	private static final List<String> DEFAULT_DELIMITERS = Arrays.asList(new String[]{",", "\n"});
 	private static final String ESCAPE_CHARACTER = "\\";
-	private static final String DEFAULT_DELIMITER = "[,\n]";
-	private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//\\[?([^\\]]*)\\]?\\n(.*)");
+	private static final Pattern CALCULATOR_EXPRESSION_PATTERN = Pattern.compile("(//(.*)\\n)?(.{2,})");
 	private static final Pattern SPECIAL_REGEX_SYMBOLS_PATTERN = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
 
-	public int add(String numbers) {
-		if (StringUtils.isEmpty(numbers)) {
+	public int add(String numbersToken) {
+		if (StringUtils.isEmpty(numbersToken)) {
 			return 0;
 		}
 
-		String[] arr = getNumbers(numbers);
+		List<String> delimiters = getDelimiters(numbersToken);
+		String numbers = getNumbersStr(numbersToken);
+		String[] arr = getNumbers(numbers, delimiters);
 		return Arrays
 			.stream(arr)
 			.mapToInt(Integer::parseInt)
@@ -28,37 +30,73 @@ public class Calculator {
 			.sum();
 	}
 
+	private String getNumbersStr(String numbersToken) {
+		Matcher matcher = CALCULATOR_EXPRESSION_PATTERN.matcher(numbersToken);
+		if (matcher.matches()) {
+			final int numbersGroup = 3;
+			return matcher.group(numbersGroup);
+		}
+
+		return numbersToken;
+	}
+
+	private List<String> getDelimiters(String numbersToken) {
+		Matcher matcher = CALCULATOR_EXPRESSION_PATTERN.matcher(numbersToken);
+		if (matcher.matches()) {
+			final int delimitersGroup = 2;
+			String delimitersStr = matcher.group(delimitersGroup);
+			if (delimitersStr == null) {
+				return DEFAULT_DELIMITERS;
+			} else if (delimitersStr.length() == 1) {
+				return Collections.singletonList(escapeSpecSymbols(delimitersStr));
+			}
+
+			char[] delimitersStrChars = delimitersStr.toCharArray();
+			ArrayList<String> delimiters = new ArrayList<>();
+			StringBuilder currentDelimiter = new StringBuilder();
+			for (char ch : delimitersStrChars) {
+				if (ch == '[') {
+					currentDelimiter.setLength(0);
+					continue;
+				} else if (ch == ']') {
+					delimiters.add(currentDelimiter.toString());
+				}
+
+				String escapedChStr = escapeSpecSymbols("" + ch);
+				currentDelimiter.append(escapedChStr);
+			}
+
+			return delimiters;
+		}
+
+		return DEFAULT_DELIMITERS;
+	}
+
 	private boolean isSpecialRegexSymbol(String symbol) {
 		Matcher matcher = SPECIAL_REGEX_SYMBOLS_PATTERN.matcher(symbol);
 		return matcher.find();
 	}
 
-	private String[] getNumbers(String numbers) {
-		return getCustomSeparatedNumbers(numbers)
-			.orElseGet(() -> getDefaultSeparatedNumbers(numbers));
-	}
-
-	private String[] getDefaultSeparatedNumbers(String numbers) {
-		String[] numbersArr = numbers.split(DEFAULT_DELIMITER);
+	private String[] getNumbers(String numbers, List<String> delimiters) {
+		String delimitersPattern = getDelimitersPattern(delimiters);
+		String[] numbersArr = numbers.split(delimitersPattern);
 		validateNumbers(numbersArr);
+
 		return numbersArr;
 	}
 
-	private Optional<String[]> getCustomSeparatedNumbers(String numbers) {
-		Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(numbers);
-		if (matcher.matches()) {
-			String delimiter = matcher.group(1);
-			String delimiterEscaped = escapeSpecSymbols(delimiter);
-			String customSeparatedNumbers = matcher.group(2);
-			String[] customSeparatedNumbersArr = customSeparatedNumbers.split(delimiterEscaped);
-			if (!NEGATIVE_SIGN.equals(delimiter)) {
-				validateNumbers(customSeparatedNumbersArr);
-			}
+	private String getDelimitersPattern(List<String> delimiters) {
+		StringBuilder delimitersPattern = new StringBuilder();
+		for (int i = 0; i < delimiters.size(); i++) {
+			String delimiter = delimiters.get(i);
+			delimitersPattern.append(delimiter);
 
-			return Optional.of(customSeparatedNumbersArr);
+			if (i != (delimiters.size() - 1)) {
+				delimitersPattern.append("|");
+			}
 		}
 
-		return Optional.empty();
+		return delimitersPattern.toString();
 	}
 
 	private String escapeSpecSymbols(String delimiter) {
