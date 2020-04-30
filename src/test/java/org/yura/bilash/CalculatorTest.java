@@ -3,6 +3,7 @@ package org.yura.bilash;
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -21,6 +22,14 @@ public class CalculatorTest {
 		"[-1, -2, -4]"
 	};
 
+	private static Calculator calculator;
+
+	@BeforeAll
+	public static void setUp() {
+		// arrange
+		calculator = new Calculator();
+	}
+
 	@ParameterizedTest
 	@CsvSource(value = {
 		"'' -> 0",
@@ -29,9 +38,6 @@ public class CalculatorTest {
 		"2,4 -> 6"
 	}, delimiterString = "->")
 	public void addUpToTwoNumbersWhenStringIsValid(String numbers, Integer expected) {
-		// arrange
-		var calculator = new Calculator();
-
 		// act
 		int result = calculator.add(numbers);
 
@@ -45,7 +51,6 @@ public class CalculatorTest {
 		"10,20,10,10 -> 50"
 	}, delimiterString = "->")
 	public void addUpToUnknownAmountOfNumbersWhenStringIsValid(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -56,7 +61,6 @@ public class CalculatorTest {
 		"10\n20\n10,10 -> 50"
 	})
 	public void addHandleNewLinesBetweenNumbers(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -69,7 +73,6 @@ public class CalculatorTest {
 		"//|\n1|2|3|4|5 -> 15"
 	})
 	public void addSupportDifferentDelimiters(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -81,7 +84,6 @@ public class CalculatorTest {
 		"-1,-2,3,-4"
 	})
 	public void addNegativeNotAllowedException(String numbers) {
-		var calculator = new Calculator();
 		NegativeNotAllowedException exc = assertThrows(NegativeNotAllowedException.class, () -> {
 			calculator.add(numbers);
 		});
@@ -98,7 +100,6 @@ public class CalculatorTest {
 		"//*\n10000*2*3*4 -> 9"
 	})
 	public void addIgnoreBigNumbers(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -110,7 +111,6 @@ public class CalculatorTest {
 		"//[->]\n1->2->3->4->5 -> 15"
 	})
 	public void addAnyLengthDelimiter(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -122,7 +122,6 @@ public class CalculatorTest {
 		"//[*][%][-]\n1*2%3-4 -> 10",
 	})
 	public void addAllowMultipleDelimiters(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
@@ -133,7 +132,6 @@ public class CalculatorTest {
 		"//[*][%%][--]\n1*2%%3--4 -> 10",
 	})
 	public void addAllowMultipleDelimitersWithAnyLengthLong(String numbers, Integer expected) {
-		var calculator = new Calculator();
 		int result = calculator.add(numbers);
 		assertEquals(expected, result);
 	}
