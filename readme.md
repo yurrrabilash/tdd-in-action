@@ -9,7 +9,7 @@ Java implementation you can find in this repository.
 ## C# implementation
 C# implementation: [original link](https://youtu.be/y8TcPr73Bwo)
 
-##How to run tests
+## How to run tests
 Since it's a maven based project you can easily import it in your favorite IDE and run tests from there.
 Or you can run tests from the command line via command:
 ```
