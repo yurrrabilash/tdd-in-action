@@ -3,7 +3,7 @@ package org.yura.bilash;
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -22,10 +22,10 @@ public class CalculatorTest {
 		"[-1, -2, -4]"
 	};
 
-	private static Calculator calculator;
+	private Calculator calculator;
 
-	@BeforeAll
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		// arrange
 		calculator = new Calculator();
 	}
